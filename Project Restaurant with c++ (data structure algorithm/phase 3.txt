@@ -1,0 +1,745 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <cstring>
+#include <limits>
+using namespace std;
+const int MAX_SIZE = 100;
+
+class Staff {
+private:
+    string name;
+    string email;
+    string phone;
+    string position;
+    string password;
+
+public:
+    Staff() {}
+    Staff(const string& name, const string& email, const string& phone, const string& position, const string& password)
+            : name(name), email(email), phone(phone), position(position), password(password) {}
+
+    string getName() const {
+        return name;
+    }
+
+    void display() const {
+        cout << "Staff Name: " << name << "\nEmail: " << email << "\nPhone: " << phone << "\nPosition: " << position << endl;
+    }
+
+    string getPassword() {
+        return password;
+    }
+};
+
+struct Nodee {
+    Staff data;
+    Nodee* next;
+
+    Nodee(const Staff& data, Nodee* next = nullptr)
+            : data(data), next(next) {}
+};
+
+class StaffList {
+private:
+    Nodee* head;
+
+public:
+    StaffList() : head(nullptr) {}
+
+    ~StaffList() {
+        Nodee* current = head;
+        while (current != nullptr) {
+            Nodee* next = current->next;
+            delete current;
+            current = next;
+        }
+    }
+
+    void append(const Staff& data) {
+        if (head == nullptr) {
+            head = new Nodee(data);
+        } else {
+            Nodee* current = head;
+            while (current->next != nullptr) {
+                current = current->next;
+            }
+            current->next = new Nodee(data);
+        }
+    }
+
+    void display() const {
+        Nodee* current = head;
+      
+        Staff tempStaff[MAX_SIZE];
+        int index = 0;
+        while (current != nullptr) {
+            tempStaff[index++] = current->data;
+            current = current->next;
+        }
+
+        for (int i = 0; i < index - 1; ++i) {
+            for (int j = 0; j < index - i - 1; ++j) {
+                if (tempStaff[j].getName() > tempStaff[j + 1].getName()) {
+                    Staff temp = tempStaff[j];
+                    tempStaff[j] = tempStaff[j + 1];
+                    tempStaff[j + 1] = temp;
+                }
+            }
+        }
+
+     
+        for (int i = 0; i < index; ++i) {
+            tempStaff[i].display();
+        }
+    }
+
+
+    bool find(const string& name) const {
+        Nodee* current = head;
+        while (current != nullptr) {
+            if (current->data.getName() == name) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+
+    Nodee* getNodeByName(const string& name) const {
+        Nodee* current = head;
+        while (current != nullptr) {
+            if (current->data.getName() == name) {
+                return current;
+            }
+            current = current->next;
+        }
+        return nullptr;
+    }
+
+    void addStaff() {
+        string name, email, phone, position, password;
+        cout << "Enter staff name: ";
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        getline(cin, name);
+
+        cout << "Enter email: ";
+        getline(cin, email);
+
+        cout << "Enter phone number: ";
+        getline(cin, phone);
+
+        cout << "Enter position: ";
+        getline(cin, position);
+
+        cout << "Enter password: ";
+        getline(cin, password);
+
+        Staff newStaff(name, email, phone, position, password);
+        append(newStaff);
+        cout << "Staff member added successfully!\n\n";
+    }
+};
+
+class BST {
+private:
+    struct Node {
+        Staff data;
+        Node* left;
+        Node* right;
+
+        Node(const Staff& data) : data(data), left(nullptr), right(nullptr) {}
+    };
+
+    Node* root;
+
+public:
+    BST() : root(nullptr) {}
+
+    ~BST() {
+        clear(root);
+    }
+
+    void clear(Node* node) {
+        if (node != nullptr) {
+            clear(node->left);
+            clear(node->right);
+            delete node;
+        }
+    }
+
+    void insert(const Staff& data) {
+        root = insertRecursive(root, data);
+    }
+
+    Node* insertRecursive(Node* root, const Staff& data) {
+        if (root == nullptr) {
+            return new Node(data);
+        }
+
+        if (data.getName() < root->data.getName()) {
+            root->left = insertRecursive(root->left, data);
+        } else if (data.getName() > root->data.getName()) {
+            root->right = insertRecursive(root->right, data);
+        }
+
+        return root;
+    }
+
+    bool search(const string& name) {
+        return searchRecursive(root, name);
+    }
+
+    bool searchRecursive(Node* root, const string& name) {
+        if (root == nullptr) {
+            return false;
+        }
+
+        if (root->data.getName() == name) {
+            return true;
+        }
+
+        if (name < root->data.getName()) {
+            return searchRecursive(root->left, name);
+        } else {
+            return searchRecursive(root->right, name);
+        }
+    }
+
+    void displayInOrder() {
+        inorder(root);
+    }
+
+    void inorder(Node* node) {
+        if (node != nullptr) {
+            inorder(node->left);
+            node->data.display();
+            inorder(node->right);
+        }
+    }
+};
+
+class Node {
+public:
+    string data;
+    Node* next;
+
+    Node(string value) : data(value), next(nullptr) {}
+};
+
+class Circular_Linked_List {
+private:
+    Node* head;
+
+public:
+    Circular_Linked_List() : head(nullptr) {}
+
+    bool isEmpty() const {
+        return head == nullptr;
+    }
+
+    void addNode(string stringAdded) {
+        Node* newNode = new Node(stringAdded);
+        if (isEmpty()) {
+            newNode->next = newNode;
+        } else {
+            newNode->next = head->next;
+            head->next = newNode;
+        }
+        head = newNode;
+    }
+
+    void RemoveNode() {
+        if (isEmpty()) {
+            cout << "I'm sorry, It is empty" << endl;
+        } else {
+            Node* temp = head;
+            if (head->next == head) {
+                head = nullptr;
+            } else {
+                Node* prev = head;
+                while (prev->next != head) {
+                    prev = prev->next;
+                }
+                prev->next = head->next;
+                head = prev;
+            }
+            cout << "The popped element is " << temp->data << endl;
+            delete temp;
+        }
+    }
+
+    void print() const {
+        if (isEmpty()) {
+            cout << "I'm sorry, It is empty" << endl;
+            return;
+        }
+        cout << "[";
+        Node* current = head->next;
+        while (true) {
+            cout << current->data;
+            if (current->next == head->next) {
+                break;
+            }
+            cout << ", ";
+            current = current->next;
+        }
+        cout << "]" << endl;
+    }
+};
+
+struct order {
+    int code;
+    int ordertime;
+    time_t date;
+    string ordername;
+};
+
+struct recipe {
+    Circular_Linked_List steps;
+    string name;
+    int durationMinutes;
+
+    recipe() {}
+
+    void addStep(string step) {
+        steps.addNode(step);
+    }
+
+    void setName(string recipeName) {
+        name = recipeName;
+    }
+
+    void setDuration(int
+
+                     minutes) {
+        durationMinutes = minutes;
+    }
+
+    void printRecipe() const {
+        cout << "Recipe Name: " << name << endl;
+        cout << "Steps: ";
+        steps.print();
+        cout << "Duration: " << durationMinutes << " minutes" << endl;
+    }
+};
+
+class orderLinkedlist {
+private:
+    struct Node {
+        order data;
+        Node* next;
+
+        Node(order x) : data(x), next(nullptr) {}
+    };
+
+    Node* rear;
+    Node* front;
+
+public:
+    orderLinkedlist() : rear(nullptr), front(nullptr) {}
+
+    bool isEmpty() {
+        return front == nullptr;
+    }
+
+    void addNode(order x) {
+        Node* newNode = new Node(x);
+        if (isEmpty()) {
+            front = rear = newNode;
+        } else {
+            rear->next = newNode;
+            rear = newNode;
+        }
+    }
+
+    void removeNode(int i) {
+        if (isEmpty()) {
+            cout << "I'm sorry, It is empty" << endl;
+        } else {
+            Node* temp = front;
+            front = front->next;
+            cout << "removed value is:- " << temp->data.ordername << endl;
+            delete temp;
+            if (front == nullptr) {
+                rear = nullptr;
+            }
+        }
+    }
+
+    void displaynames() {
+        if (isEmpty()) {
+            cout << "I'm sorry, It is empty" << endl;
+        } else {
+            order* tempOrders = new order[MAX_SIZE];
+            int index = 0;
+
+            Node* current = front;
+            while (current != nullptr) {
+                tempOrders[index++] = current->data;
+                current = current->next;
+            }
+
+            for (int i = 0; i < index - 1; ++i) {
+                for (int j = 0; j < index - i - 1; ++j) {
+                    if (tempOrders[j].ordertime > tempOrders[j + 1].ordertime) {
+                        order temp = tempOrders[j];
+                        tempOrders[j] = tempOrders[j + 1];
+                        tempOrders[j + 1] = temp;
+                    }
+                }
+            }
+
+            cout << "[";
+            for (int i = 0; i < index; ++i) {
+                char str[26];
+                struct tm* tm_info;
+                tm_info = localtime(&tempOrders[i].date);
+                strftime(str, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+                cout << "order code: " << tempOrders[i].code << "\n"
+                     << "order name: " << tempOrders[i].ordername << "\n"
+                     << "order date: " << str << "\n"
+                     << "order duration: " << tempOrders[i].ordertime << " minutes\n";
+                if (i < index - 1) {
+                    cout << ",";
+                }
+            }
+            cout << "]" << endl;
+
+            delete[] tempOrders;
+        }
+    }
+
+    bool search(int code) {
+        Node* current = front;
+        while (current != nullptr) {
+            if (current->data.code == code) {
+                return true;
+            }
+            current = current->next;
+        }
+        return false;
+    }
+};
+
+class restaurant {
+private:
+    BST staffBST;
+    recipe recipes[MAX_SIZE];
+    int recipeCount;
+
+public:
+    restaurant() : recipeCount(0) {}
+
+    void printMenu() {
+        if (recipeCount == 0) {
+            cout << "The menu is empty." << endl;
+            return;
+        }
+
+        cout << "Menu:\n";
+        for (int i = 0; i < recipeCount; ++i) {
+            cout << (i + 1) << "-" << recipes[i].name << "\n";
+        }
+    }
+
+    void addRecipe() {
+        recipe newRecipe;
+        string nameRecipe, step;
+        int duration, stepsNumber;
+
+        cout << "Enter recipe name: ";
+        cin.ignore();
+        getline(cin, nameRecipe);
+        newRecipe.setName(nameRecipe);
+
+        cout << "How many steps? ";
+        cin >> stepsNumber;
+        cin.ignore();
+
+        for (int i = 0; i < stepsNumber; ++i) {
+            cout << "Enter step " << i + 1 << ": ";
+            getline(cin, step);
+            newRecipe.addStep(step);
+        }
+
+        labelValidation:
+        cout << "Enter the duration in minutes: ";
+        if (!(cin >> duration) || duration < 0 || duration > 100) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Invalid input. Please enter a number between 0 and 100 for the duration.\n";
+            goto labelValidation;
+        }
+
+        newRecipe.setDuration(duration);
+        recipes[recipeCount++] = newRecipe;
+        cout << "Recipe added successfully!\n\n";
+    }
+
+    void printrecipesteps() {
+        if (recipeCount == 0) {
+            cout << "There are no recipes in the menu." << endl;
+            return;
+        }
+
+        int recipenum = -1;
+        printMenu();
+        cout << "Enter the number of the recipe to show its steps: " << endl;
+        cin >> recipenum;
+        cin.ignore();
+        if (recipenum < 1 || recipenum > recipeCount) {
+            cout << "Invalid recipe number." << endl;
+        } else {
+            recipes[recipenum - 1].printRecipe();
+        }
+    }
+
+    void placeAnOrder() {
+        printMenu();
+        order neworder;
+        int itemnum;
+
+        cout << "Enter the number of the item you want to order: ";
+        cin >> itemnum;
+
+        if (itemnum < 1 || itemnum > recipeCount) {
+            cout << "Invalid item number." << endl;
+            return;
+        }
+
+        neworder.ordername = recipes[itemnum - 1].name;
+        neworder.ordertime = recipes[itemnum - 1].durationMinutes;
+        neworder.date = time(nullptr);
+        neworder.code = rand() % 1000 + 1; // Generate a random order code
+
+        orders.addNode(neworder);
+
+        cout << "Order placed successfully!\n";
+        cout << "Order Code: " << neworder.code << endl; // Print the order code
+    }
+
+
+    void printOrders() {
+        orders.displaynames();
+    }
+
+    void deleteRecipe() {
+        if (recipeCount == 0) {
+            cout << "The menu is already empty." << endl;
+            return;
+        }
+
+        int recipenum;
+        printMenu();
+        cout << "Enter the number of the recipe you want to delete: ";
+        cin >> recipenum;
+
+        if (recipenum < 1 || recipenum > recipeCount) {
+            cout << "Invalid recipe number" << endl;
+            return;
+        }
+
+        for (int i = recipenum - 1; i < recipeCount - 1; ++i) {
+            recipes[i] = recipes[i + 1];
+        }
+        recipeCount--;
+        cout << "Recipe deleted successfully!" << endl;
+    }
+
+    void deleteOrder() {
+        if (orders.isEmpty()) {
+            cout << "There are no orders to delete." << endl;
+            return;
+        }
+
+        int ordernum;
+        orders.displaynames();
+        cout << "Enter the number of the order you want to delete: ";
+        cin >> ordernum;
+
+        if (ordernum < 1 || ordernum > MAX_SIZE) {
+            cout << "Invalid order number" << endl;
+            return;
+        }
+
+        orders.removeNode(ordernum);
+    }
+
+    void initializeSomeRecipes() {
+        recipe biryani, butterChicken;
+        biryani.setName("Biryani");
+        biryani.setDuration(60);
+        biryani.addStep("Wash the basmati rice until the water runs clear, then soak it for 30 minutes.");
+        biryani.addStep("Boil water in a large pot, adding the whole spices and salt.");
+        biryani.addStep("Add the soaked rice and cook until it's 70-80% done. Drain and set aside.");
+        recipes[recipeCount++] = biryani;
+
+        butterChicken.setName("Butter Chicken");
+        butterChicken.setDuration(40);
+        butterChicken.addStep("Marinate the Chicken");
+        butterChicken.addStep("Cook the Chicken");
+        butterChicken.addStep("Prepare the Sauce");
+        butterChicken.addStep("Finish the Dish");
+        butterChicken.addStep("Serve");
+        recipes[recipeCount++] = butterChicken;
+    }
+
+    bool login(string username, string password) {
+        // Dummy login function, replace with actual authentication mechanism
+        return true;
+    }
+
+    orderLinkedlist orders;
+};
+
+int main() {
+    restaurant myRestaurant;
+    bool run = true;
+    StaffList list;
+    Staff staff1("bahaa", "youssef@example.com", "123-456-7890", "Manager", "pas1");
+    Staff staff2("ali", "samaa@example.com", "987-654-3210", "Waiter", "pas2");
+    Staff staff3("deana", "yara@example.com", "555-555-5555", "Chef", "pas3");
+    Staff staff4("ahmed", "tamer@example.com", "123-456-7890", "Chef", "pas4");
+    Staff staff5("bahaa", "zyad@example.com", "987-654-3210", "Waiter", "pas5"
+                                                                       "");
+    list.append(staff1);
+    list.append(staff2);
+    list.append(staff3);
+    list.append(staff4);
+    list.append(staff5);
+    myRestaurant.initializeSomeRecipes();
+    while (run) {
+        char userChoice;
+        cout << "\n==================== Main Menu ====================\n";
+        cout << "Choose category:\n";
+        cout << "1- Staff\n";
+        cout << "2- Client\n";
+        cout << "3- Exit\n";
+        cout << "===================================================\n";
+        cout << "Your choice: ";
+        cin >> userChoice;
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        switch (userChoice) {
+            case '1': {
+                string username, password;
+                cout << "Enter your username: ";
+                getline(cin, username);
+
+                if (list.find(username)) {
+                    cout << "Enter your password: ";
+                    getline(cin, password);
+
+                    if ((list.getNodeByName(username)->data.getPassword() == password)) {
+                        remainsInTheSameLevel:
+                        cout << "\n------------------ Staff Menu ------------------\n";
+                        cout << "Choose action:\n";
+                        cout << "1- Display Menu\n";
+                        cout << "2- Add Recipe\n";
+                        cout << "3- Display Recipe Steps\n";
+                        cout << "4- Delete Recipe\n";
+                        cout << "5- Delete Order\n";
+                        cout << "6- Add Another Staff Member\n";
+                        cout << "7- Display Staff Members\n";
+                        cout << "8- Back\n";
+                        cout << "------------------------------------------------\n";
+                        cout << "Your choice: ";
+                        char staffChoice;
+                        cin >> staffChoice;
+                        switch (staffChoice) {
+                            case '1':
+                                myRestaurant.printMenu();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '2':
+                                myRestaurant.addRecipe();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '3':
+                                myRestaurant.printrecipesteps();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '4':
+                                myRestaurant.deleteRecipe();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '5':
+                                myRestaurant.deleteOrder();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '6':
+                                list.addStaff();
+                                goto remainsInTheSameLevel;
+                                break;
+                            case '7':
+                                list.display();
+                                break;
+                            case '8':
+                                // Intentionally left blank for 'Back' functionality
+                                break;
+                            default:
+                                cout << "Invalid choice, please try again." << endl;
+                                goto remainsInTheSameLevel;
+                        }
+                    } else {
+                        cout << "Invalid password, please try again." << endl;
+                    }
+                } else {
+                    cout << "This username is not valid" << endl;
+                }
+            }
+                break;
+
+            case '2': {
+                cout << "\n------------------ Client Menu ------------------\n";
+                cout << "Choose action:\n";
+                cout << "1- Display Menu\n";
+                cout << "2- Place an Order\n";
+                cout << "3- Display All Orders\n";
+                cout << "4- Search for an Order\n";
+                cout << "5- Back\n";
+                cout << "------------------------------------------------\n";
+                cout << "Your choice: ";
+                char clientChoice;
+                cin >> clientChoice;
+                switch (clientChoice) {
+                    case '1':
+                        myRestaurant.printMenu();
+                        break;
+                    case '2':
+                        myRestaurant.placeAnOrder();
+                        break;
+                    case '3':
+                        myRestaurant.printOrders();
+                        break;
+                    case '4': {
+                        int orderCode;
+                        cout << "Enter the order code to search: ";
+                        cin >> orderCode;
+
+                        if (myRestaurant.orders.search(orderCode)) {
+                            cout << "Order found!" << endl;
+                        } else {
+                            cout << "Order not found." << endl;
+                        }
+                            break;
+                    }
+                    case '5':
+                        // Intentionally left blank for 'Back' functionality
+                        break;
+                    default:
+                        cout << "Invalid choice, please try again." << endl;
+                }
+                break;
+            }
+            case '3':
+                cout << "Exiting." << endl;
+                run = false;
+                break;
+            default:
+                cout << "Please choose from the available options." << endl;
+        }
+    }
+    return 0;
+}

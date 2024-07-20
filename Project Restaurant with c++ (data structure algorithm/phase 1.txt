@@ -1,0 +1,561 @@
+#include <iostream>
+#include <string>
+#include <ctime>
+#include <string.h>
+#include <limits>
+using namespace std;
+int ordercode=0 ;
+const int MAX_SIZE = 100;
+struct order
+{
+    int code;
+    int ordertime;
+    time_t date;
+    string ordername;
+};
+class stringStack
+{
+private:
+    int top;
+    string s[MAX_SIZE];
+public:
+    stringStack()  {
+
+    top=-1;}
+
+    bool isEmpty()
+    {
+        return top == -1;
+    }
+
+    bool isFull()
+    {
+        return top == (MAX_SIZE - 1);
+    }
+
+    void push( string stringAdded)
+    {
+        if (isFull())
+        {
+            cout << "The stack is full" << endl;
+        }
+        else
+        {
+            s[++top] = stringAdded;
+        }
+    }
+
+    void pop()
+    {
+        if (isEmpty())
+        {
+            cout << "The stack is empty" << endl;
+        }
+        else
+        {
+            cout << "The popped element is " << s[top--] << endl;
+        }
+    }
+
+    void print() const
+    {
+        cout << "[";
+        for (int i = 0; i <= top; i++)
+        {
+            cout << s[i];
+            if (i < top)
+            {
+                cout << ", ";
+            }
+        }
+        cout << "]" << endl;
+    }
+};
+
+struct recipe
+{
+    stringStack steps;
+    string name;
+    int durationMinutes;
+    recipe()  {}
+
+    void addStep( string step)
+    {
+        steps.push(step);
+    }
+
+    void setName( string recipeName)
+    {
+        name = recipeName;
+    }
+
+    void setDuration(int minutes)
+    {
+        durationMinutes = minutes;
+    }
+
+    void printRecipe() const
+    {
+        cout << "Recipe Name: " << name << endl;
+        cout << "Steps: ";
+        steps.print();
+        cout << "Duration: " << durationMinutes << " minutes" << endl;
+    }
+};
+
+
+
+class orderqueue
+{
+private:
+    int rear, front;
+    order q[MAX_SIZE];
+
+
+public:
+    orderqueue()
+    {
+        rear = front = -1;
+    }
+    bool isEmpty()
+    {
+        if (front == -1 && rear == -1)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    bool isFull()
+    {
+        if (rear == (MAX_SIZE - 1))
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    void enqueue(order x)
+    {
+        if (isFull())
+            cout << "the queue is full\n";
+        else if (x.ordername== "null") {
+            cout << "This order can't be placed\n";
+
+        } else {
+            if (isEmpty()) {
+                front++;
+            }
+
+            ordercode++;
+            x.code = ordercode;
+            rear++;
+            q[rear] = x;
+        }
+    }
+    void dequeue()
+    {
+        order removedvalue;
+        if (isEmpty())
+        {
+            cout << "the queue is empty!\n";
+        }
+        else if (rear == front)
+        {
+            removedvalue = q[front];
+            rear = front = -1;
+            cout << "removed value is:- " << removedvalue.ordername;
+        }
+        else
+        {
+            removedvalue = q[front];
+            front++;
+            cout << "removed value is:- " << removedvalue .ordername << endl;
+        }
+    }
+
+    void displaynames()
+    {
+        if (isEmpty())
+            cout << "the queue is empty!\n";
+        else
+        {
+            cout << "[";
+            for (int tempfront = front; tempfront <= rear; tempfront++)
+            {
+                if(q[tempfront].ordername=="null")
+                    continue;
+                char str[26];
+                struct tm* tm_info;
+                tm_info = localtime(&q[tempfront].date);
+                strftime(str, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+
+                cout <<front+1<<"-\norder code- "<< q[tempfront].code<<"\norder name- "<<q[tempfront].ordername<<"\norder date- "<< str <<"\norder duration - "<<q[tempfront].ordertime<<" minutes\n";
+                if (tempfront < rear)
+                {
+                    cout << ",";
+                }
+            }
+            cout << "]\n";
+        }
+    }
+
+
+
+};
+
+class queue
+{
+private:
+    int rear, front;
+    recipe q[MAX_SIZE];
+
+public:
+    queue()
+    {
+        rear = front = -1;
+    }
+    bool isEmpty()
+    {
+        if (front == -1 && rear == -1)
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    bool isFull()
+    {
+        if (rear == (MAX_SIZE - 1))
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+    void enqueue(recipe x)
+    {
+        if (isFull())
+            cout << "the queue is full\n";
+        else if (isEmpty())
+        {
+            front++;
+        }
+
+        rear++;
+        q[rear] = x;
+    }
+    void dequeue()
+    {
+        recipe removedvalue;
+        if (isEmpty())
+        {
+            cout << "the queue is empty!\n";
+        }
+        else if (rear == front)
+        {
+            removedvalue = q[front];
+            q[front].name="null";
+            q[front].durationMinutes=0;
+            rear = front = -1;
+            cout << "removed value is:- " << removedvalue.name;
+        }
+        else
+        {
+            removedvalue = q[front];
+            q[front].name="null";
+            q[front].durationMinutes=0;
+            front++;
+            cout << "removed value is:- " << removedvalue .name << endl;
+        }
+    }
+
+    void displaynames()
+    {
+        if (isEmpty())
+            cout << "the queue is empty!\n";
+        else
+        {
+
+
+            for (int tempfront = front; tempfront <= rear; tempfront++)
+            {
+                cout <<tempfront+1<<"-"<< q[tempfront].name<<"\n";
+
+            }
+        }
+    }
+    void getFront(int *indxfront, recipe *valuefront)
+    {
+        if (isEmpty())
+        {
+            cout << "the queue is empty!\n";
+            *indxfront = -1;
+        }
+        else
+        {
+            *indxfront = front;
+            *valuefront = q[front];
+        }
+    }
+    void printRecipesteps(int recipenum)
+    {
+        q[recipenum].printRecipe();
+    }
+
+    string getname(int numitem)
+    {
+        return q[numitem-1].name;
+    }
+
+    int getduration(int numitem)
+    {
+        return q[numitem-1].durationMinutes;
+    }
+
+
+};
+
+
+class restaurant
+{
+    queue menu;
+    orderqueue orders;
+
+
+public:
+    restaurant()
+    {
+
+    }
+    void printMenu()
+    {
+        menu.displaynames();
+    }
+  void addRecipe()
+{
+    recipe newRecipe;
+    string input, step;
+    int duration, stepsNumber;
+
+    cout << "Enter recipe name: ";
+    cin >> input;
+    newRecipe.setName(input);
+
+    cout << "How many steps? ";
+    cin >> stepsNumber;
+    cin.ignore();
+
+    for (int i = 0; i < stepsNumber; ++i)
+    {
+        cout << "Enter step " << i + 1 << ": ";
+        getline(cin, step);
+        newRecipe.addStep(step);
+    }
+
+labelValidation:
+    cout << "Enter the duration in minutes: ";
+    if (!(cin >> duration) || duration < 0 || duration > 100)
+    {
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+        cout << "Invalid input. Please enter a number between 0 and 100 for the duration.\n";
+        goto labelValidation;
+    }
+
+    newRecipe.setDuration(duration);
+    menu.enqueue(newRecipe);
+    cout << "Recipe added successfully!\n\n";
+}
+
+    void printrecipesteps()
+    {
+        int recipenum = -1;
+        menu.displaynames();
+        cout << "Enter the number of the recipe to show its steps: " << endl;
+        cin >> recipenum;
+        cin.ignore();
+        if(recipenum < 1)
+        {
+            cout << "There are no recipes" << endl;
+        }
+        else
+        {
+
+            menu.printRecipesteps(recipenum - 1);
+        }
+    }
+    void placeAnOrder()
+    {
+        printMenu();
+        order neworder;
+        int itemnum;
+
+
+        cout<<"Enter the number of item you want to order :"<<endl;
+        cin>>itemnum;
+        neworder.ordername=menu.getname(itemnum);
+        neworder.ordertime=menu.getduration(itemnum);
+        neworder.date=time(nullptr);
+        orders.enqueue(neworder);
+
+
+
+    }
+
+    void printOrders()
+    {
+        orders.displaynames();
+
+
+    }
+
+    void deleterecipe()
+    {
+        int recipenum;
+        menu.displaynames();
+        cout<<"if you are sure you want to delete first recipe you want to delete enter 1"<<endl;
+        cin>>recipenum;
+        if(recipenum==1)
+        {
+            menu.dequeue();
+        }
+        else
+            return;
+
+    }
+    void deleteorder()
+    {
+        int ordernum;
+        orders.displaynames();
+        cout<<"if you are sure you want to delete first order you want to delete enter 1"<<endl;
+        cin>>ordernum;
+        if(ordernum==1)
+        {
+            orders.dequeue();
+        }
+        else
+            return;
+
+    }
+    void initializeSomeRecipes()
+    {
+        recipe biryani,butterChicken;
+        biryani.setName("Biryani");
+        biryani.setDuration(40);
+        biryani.steps.push("Wash the basmati rice until the water runs clear, then soak it for 30 minutes.");
+        biryani.steps.push("Boil water in a large pot, adding the whole spices and salt.");
+        biryani.steps.push("Add the soaked rice and cook until it's 70-80% done. Drain and set aside.");
+        menu.enqueue(biryani);
+
+        butterChicken.setName("Butter Chicken");
+        butterChicken.setDuration(40);
+        butterChicken.steps.push("Marinate the Chicken");
+        butterChicken.steps.push("Cook the Chicken");
+        butterChicken.steps.push("Prepare the Sauce");
+        butterChicken.steps.push("Finish the Dish");
+        butterChicken.steps.push("Serve");
+        menu.enqueue(butterChicken);
+    }
+
+
+};
+int main()
+{
+    restaurant myRestaurant;
+    bool run=true;
+
+    myRestaurant.initializeSomeRecipes();
+    while(run)
+    {
+        int userChoice;
+        cout << "\n==================== Main Menu ====================\n";
+        cout << "Choose category:\n";
+        cout << "1- Staff\n";
+        cout << "2- Client\n";
+        cout << "3- Exit\n";
+        cout << "===================================================\n";
+        cout << "Your choice: ";
+        cin >> userChoice;
+
+        switch (userChoice)
+        {
+            case 1:
+            {
+                cout << "\n------------------ Staff Menu ------------------\n";
+                cout << "Choose action:\n";
+                cout << "1- Display Menu\n";
+                cout << "2- Add Recipe\n";
+                cout << "3- Display Recipe Steps\n";
+                cout << "4- Delete First Recipe\n";
+                cout << "5- Delete First Order\n";
+                cout << "6- Back\n";
+                cout << "------------------------------------------------\n";
+                cout << "Your choice: ";
+                int staffChoice;
+                cin >> staffChoice;
+                switch (staffChoice)
+                {
+                    case 1:
+                        myRestaurant.printMenu();
+                        break;
+                    case 2:
+                        myRestaurant.addRecipe();
+                        break;
+                    case 3:
+                        myRestaurant.printrecipesteps();
+                        break;
+                    case 4:
+                        myRestaurant.deleterecipe();
+                        break;
+                    case 5:
+                        myRestaurant.deleteorder();
+                        break;
+                    case 6:
+                        // Intentionally left blank for 'Back' functionality
+                        break;
+                    default:
+                        cout << "Invalid choice, please try again." << endl;
+                }
+                break;
+            }
+            case 2:
+            {
+                cout << "\n------------------ Client Menu ------------------\n";
+                cout << "Choose action:\n";
+                cout << "1- Display Menu\n";
+                cout << "2- Place an Order\n";
+                cout << "3- Display All Orders\n";
+                cout << "4- Back\n";
+                cout << "------------------------------------------------\n";
+                cout << "Your choice: ";
+                int clientChoice;
+                cin >> clientChoice;
+                switch (clientChoice)
+                {
+                    case 1:
+                        myRestaurant.printMenu();
+                        break;
+                    case 2:
+                        myRestaurant.placeAnOrder();
+                        break;
+                    case 3:
+                        myRestaurant.printOrders();
+                        break;
+                    case 4:
+                        // Intentionally left blank for 'Back' functionality
+                        break;
+                    default:
+                        cout << "Invalid choice, please try again." << endl;
+                }
+                break;
+            }
+            case 3:
+                cout << "Exiting." << endl;
+                run = false;
+                break;
+            default:
+                cout << "Please choose from the available options." << endl;
+        }
+    }
+}
